@@ -1,0 +1,18 @@
+version: 1
+
+setup:
+  - set -e
+  - echo "Starting setup"
+  - pip install --user platformio
+  - export PATH="$HOME/.local/bin:$PATH"
+  - pio --version
+  - pio run
+
+build:
+  command: pio run
+
+# test:
+#   command: echo "Skipping tests (handled via PlatformIO)"
+
+# check:
+#   command: echo "No additional checks"
