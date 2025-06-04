@@ -21,7 +21,6 @@
 
 */
 
-#include "../shared.h"
 
 #if SPINDLE_ENABLE & (1<<SPINDLE_FRCS82)
 
@@ -58,8 +57,7 @@ static void spindleGetRPMLimits (void *data)
         .adu[0] = modbus_address,
         .adu[1] = ModBus_ReadHoldingRegisters,
         .adu[2] = 0x00,
-    // TODO: update register address for minimum frequency
-        .adu[3] = 0x0B, // PD11
+        .adu[3] = 0x0B, // PD11 minimum frequency
         .adu[4] = 0x00,
         .adu[5] = 0x01,
         .tx_length = 8,
@@ -68,7 +66,6 @@ static void spindleGetRPMLimits (void *data)
 
     if(modbus_send(&cmd, &callbacks, true)) {
 
-        // TODO: update register address for maximum frequency
         cmd.context = (void *)VFD_GetMaxRPM;
         cmd.adu[3] = 0x05; // PD05
 
@@ -83,8 +80,7 @@ static void set_rpm (float rpm, bool block)
     if(busy && !block)
         return;
 
-        // TODO: verify frequency to RPM formula for FR-CS82S
-    if(rpm != spindle_data.rpm_programmed) {
+        if(rpm != spindle_data.rpm_programmed) {
 
         uint16_t freq = (uint16_t)(rpm * 0.167f); // * 10.0f / 60.0f
 
@@ -92,7 +88,6 @@ static void set_rpm (float rpm, bool block)
 
         modbus_message_t rpm_cmd = {
             .context = (void *)VFD_SetRPM,
-            // TODO: update register address for set frequency
             .crc_check = false,
             .adu[0] = modbus_address,
             .adu[1] = ModBus_WriteRegister,
@@ -133,7 +128,6 @@ static void spindleSetState (spindle_ptrs_t *spindle, spindle_state_t state, flo
         .crc_check = false,
         .adu[0] = modbus_address,
         .adu[1] = ModBus_WriteCoil,
-        // TODO: update command values for run/stop and direction
         .adu[2] = 0x00,
         .adu[3] = (!state.on || rpm == 0.0f) ? 0x4B : (state.ccw ? 0x4A : 0x49),
         .adu[4] = 0xFF,
@@ -173,7 +167,7 @@ static spindle_state_t spindleGetState (spindle_ptrs_t *spindle)
         .rx_length = 9
     };
 
-    modbus_send(&mode_cmd, &callbacks, false); // TODO: add flag for not raising alarm?
+    modbus_send(&mode_cmd, &callbacks, false);
 
     vfd_state.at_speed = spindle->get_data(SpindleData_AtSpeed)->state_programmed.at_speed;
 
