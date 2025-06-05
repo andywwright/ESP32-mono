@@ -80,7 +80,6 @@
 
 #define LWIP_RAND_WIZ() ((u32_t)rand())
 
-#if 0
 #define LWIP_DEBUG
 #define TCP_DEBUG LWIP_DBG_OFF
 #define ETHARP_DEBUG LWIP_DBG_OFF
@@ -89,6 +88,15 @@
 #define TCPIP_DEBUG LWIP_DBG_OFF
 #define DHCP_DEBUG LWIP_DBG_OFF
 #define UDP_DEBUG LWIP_DBG_OFF
-#endif
+
+/* HTTP debug placeholders */
+#define HTTPD_DEBUG        LWIP_DBG_OFF
+#define HTTPD_DEBUG_TIMING LWIP_DBG_OFF
+
+/* Modbus debug flags */
+#define MODBUS_DEBUG_TRACE      (LWIP_DBG_ON | LWIP_DBG_TRACE)
+#define MODBUS_DEBUG_STATE      (LWIP_DBG_ON | LWIP_DBG_STATE)
+#define MODBUS_DEBUG_WARN       (LWIP_DBG_ON | LWIP_DBG_LEVEL_WARNING)
+#define MODBUS_DEBUG_WARN_STATE (MODBUS_DEBUG_WARN | LWIP_DBG_STATE)
 
 #endif /* __LWIPOPTS_H__ */
