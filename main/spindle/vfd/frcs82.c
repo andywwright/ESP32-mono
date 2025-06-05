@@ -81,7 +81,7 @@ static void set_rpm (float rpm, bool block)
     if(busy && !block)
         return;
 
-        if(rpm != spindle_data.rpm_programmed) {
+    if(rpm != spindle_data.rpm_programmed) {
 
         uint16_t freq = (uint16_t)(rpm * 0.167f); // * 10.0f / 60.0f
 

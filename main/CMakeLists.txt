@@ -127,6 +127,7 @@ set(SPINDLE_SOURCE
  spindle/stepper.c
  spindle/vfd/gs20.c
  spindle/vfd/h100.c
+ spindle/vfd/frcs82.c
  spindle/vfd/huanyang.c
  spindle/vfd/huanyang2.c
  spindle/vfd/modvfd.c
