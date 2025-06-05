@@ -26,6 +26,9 @@
 #include "hal.h"
 #include "protocol.h"
 #include "settings.h"
+#ifdef DEBUGOUT
+#include <stdio.h>
+#endif
 #include "crc.h"
 #include "nvs_buffer.h"
 #include "state_machine.h"
@@ -65,6 +68,22 @@ typedef struct queue_entry {
     modbus_callbacks_t callbacks;
     struct queue_entry *next;
 } queue_entry_t;
+
+#ifdef DEBUGOUT
+static const char *adu_str(const uint8_t *data, uint8_t len)
+{
+    static char buf[MODBUS_MAX_ADU_SIZE * 3];
+    char *p = buf;
+    for(uint8_t i = 0; i < len; i++) {
+        sprintf(p, "%02X", data[i]);
+        p += 2;
+        if(i < len - 1)
+            *p++ = ' ';
+    }
+    *p = '\0';
+    return buf;
+}
+#endif
 
 static const uint32_t baud[] = { 2400, 4800, 9600, 19200, 38400, 115200 };
 static const modbus_silence_timeout_t dflt_timeout =
@@ -138,6 +157,9 @@ static void tx_message (volatile queue_entry_t *msg)
     state = ModBus_TX;
     rx_timeout = modbus.rx_timeout;
 
+#ifdef DEBUGOUT
+    debug_print("[MODBUS TX] %s", adu_str(((queue_entry_t *)msg)->msg.adu, ((queue_entry_t *)msg)->msg.tx_length));
+#endif
     stream.flush_rx_buffer();
     stream.write((char *)((queue_entry_t *)msg)->msg.adu, ((queue_entry_t *)msg)->msg.tx_length);
 }
@@ -195,6 +217,9 @@ static void modbus_poll (void *data)
                 } else
                     state = ModBus_Timeout;
                 spin_lock = false;
+#ifdef DEBUGOUT
+                debug_print(state == ModBus_Timeout ? "[MODBUS TIMEOUT]" : "[MODBUS EXCEPTION %d]", exception_code);
+#endif
                 if(state != ModBus_AwaitReply)
                     silence_until = hal.get_elapsed_ticks() + silence_timeout;
                 return;
@@ -208,6 +233,9 @@ static void modbus_poll (void *data)
                 do {
                     *buf++ = stream.read();
                 } while(--packet->msg.rx_length);
+#ifdef DEBUGOUT
+                debug_print("[MODBUS RX] %s", adu_str(((queue_entry_t *)packet)->msg.adu, rx_len));
+#endif
 
                 if(packet->msg.crc_check) {
                     uint_fast16_t crc = modbus_crc16x(((queue_entry_t *)packet)->msg.adu, rx_len - 2);
@@ -240,6 +268,9 @@ static void modbus_poll (void *data)
             if(packet->async)
                 state = ModBus_Silent;
             silence_until = hal.get_elapsed_ticks() + silence_timeout;
+#ifdef DEBUGOUT
+    debug_writeln("[MODBUS TIMEOUT]");
+#endif
             break;
 
         default:
@@ -290,12 +321,18 @@ static bool modbus_send_rtu (modbus_message_t *msg, const modbus_callbacks_t *ca
                     if(packet->callbacks.on_rx_exception)
                         packet->callbacks.on_rx_exception(0, packet->msg.context);
                     poll = packet->callbacks.retries > 0;
+#ifdef DEBUGOUT
+                    debug_writeln("[MODBUS TIMEOUT]");
+#endif
                     break;
 
                 case ModBus_Exception:
                     if(packet->callbacks.on_rx_exception)
                         packet->callbacks.on_rx_exception(exception_code == -1 ? 0 : (uint8_t)(exception_code & 0xFF), packet->msg.context);
                     poll = packet->callbacks.retries > 0;
+#ifdef DEBUGOUT
+                    debug_print("[MODBUS EXCEPTION %d]", exception_code);
+#endif
                     break;
 
                 case ModBus_GotReply:
@@ -310,6 +347,9 @@ static bool modbus_send_rtu (modbus_message_t *msg, const modbus_callbacks_t *ca
                         if(--packet->callbacks.retries == 0)
                             packet->callbacks.on_rx_exception = callbacks->on_rx_exception;
                         packet = add_message(&sync_msg, msg, false, (const modbus_callbacks_t *)&packet->callbacks);
+#ifdef DEBUGOUT
+                        debug_writeln("[MODBUS RETRY]");
+#endif
                         tx_message(packet);
                     }
                     break;
