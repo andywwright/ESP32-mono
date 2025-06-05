@@ -20,6 +20,7 @@
   along with grblHAL. If not, see <http://www.gnu.org/licenses/>.
 
 */
+#include "../shared.h"
 
 
 #if SPINDLE_ENABLE & (1<<SPINDLE_FRCS82)
@@ -80,7 +81,7 @@ static void set_rpm (float rpm, bool block)
     if(busy && !block)
         return;
 
-        if(rpm != spindle_data.rpm_programmed) {
+    if(rpm != spindle_data.rpm_programmed) {
 
         uint16_t freq = (uint16_t)(rpm * 0.167f); // * 10.0f / 60.0f
 
