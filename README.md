@@ -72,6 +72,12 @@ __NOTE:__ _grbl/config.h_ or _CMakeLists.txt_ may need modification before compi
 __NOTE:__ Configuration has been simplified a bit, primarily change options in [`CMakeLists.txt`](https://github.com/grblHAL/ESP32/blob/master/main/CMakeLists.txt) to enable/disable.
 Configuration of options in _my_machine.h_ is turned off in _CMakeLists.txt_ by default due to this.
 
+### Debugging Modbus RTU
+
+Define `DEBUGOUT` in `main/grbl/config.h` to enable verbose logging of Modbus RTU communication. When active the driver prints transmitted and received frames as well as timeout and exception events over the debug serial port.
+
+Use a secondary serial connection to capture the debug output.
+
 
 ---
 
