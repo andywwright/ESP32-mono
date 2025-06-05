@@ -423,10 +423,6 @@ void vfd_init (void)
         vfd_modvfd_init();
 #endif
 
-#if SPINDLE_ENABLE & (1<<SPINDLE_FRCS82)
-        extern void vfd_frcs82_init (void);
-        vfd_frcs82_init();
-#endif
 #if SPINDLE_ENABLE & (1<<SPINDLE_H100)
         extern void vfd_h100_init (void);
         vfd_h100_init();
