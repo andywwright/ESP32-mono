@@ -20,6 +20,7 @@
   along with grblHAL. If not, see <http://www.gnu.org/licenses/>.
 
 */
+#include "../shared.h"
 
 
 #if SPINDLE_ENABLE & (1<<SPINDLE_FRCS82)
