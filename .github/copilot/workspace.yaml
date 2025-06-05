@@ -6,10 +6,10 @@ setup:
   - pip install --user platformio
   - export PATH="$HOME/.local/bin:$PATH"
   - pio --version
-  - pio run
+  - pio run --silent
 
 build:
-  command: pio run
+  command: pio run --silent
 
 # test:
 #   command: echo "Skipping tests (handled via PlatformIO)"
