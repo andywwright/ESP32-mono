@@ -204,7 +204,7 @@ or EMI triggering the related interrupt falsely or too many times.
 // -
 
 // Enables code for debugging purposes. Not for general use and always in constant flux.
-//#define DEBUG // Uncomment to enable. Default disabled.
+#define DEBUG // Uncomment to enable. Default disabled.
 //#define DEBUGOUT 0 // Uncomment to claim serial port with given instance number and add HAL entry point for debug output.
 
 /*! @name Status report frequency
