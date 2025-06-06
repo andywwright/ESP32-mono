@@ -27,6 +27,7 @@
 #include "hal.h"
 #include "protocol.h"
 #include "settings.h"
+#include "report.h"
 #include "crc.h"
 #include "nvs_buffer.h"
 #include "state_machine.h"
@@ -413,11 +414,13 @@ static uint32_t modbus_get_baud (setting_id_t setting)
 
 static void modbus_log_settings(void)
 {
-    debug_print("MODBUS: stream=%d dir=%d baud=%lu rx_timeout=%lu silence_timeout=%lu",
-                stream_instance, dir_port,
-                (unsigned long)modbus.baud_rate,
-                (unsigned long)modbus.rx_timeout,
-                (unsigned long)silence_timeout);
+    char msg[80];
+    snprintf(msg, sizeof(msg), "MODBUS: stream=%d dir=%d baud=%lu rx_timeout=%lu silence_timeout=%lu",
+             stream_instance, dir_port,
+             (unsigned long)modbus.baud_rate,
+             (unsigned long)modbus.rx_timeout,
+             (unsigned long)silence_timeout);
+    report_message(msg, Message_Info);
 }
 
 static const setting_detail_t modbus_settings[] = {
