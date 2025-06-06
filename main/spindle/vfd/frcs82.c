@@ -83,17 +83,18 @@ static void set_rpm (float rpm, bool block)
 
     if(rpm != spindle_data.rpm_programmed) {
 
-        uint16_t freq = (uint16_t)(rpm * 0.167f); // * 10.0f / 60.0f
+        // FR-CS82 uses 0.01 Hz units for frequency commands
+        uint16_t freq = (uint16_t)(rpm * (100.0f / 60.0f));
 
         freq = min(max(freq, freq_min), freq_max);
 
         modbus_message_t rpm_cmd = {
             .context = (void *)VFD_SetRPM,
-            .crc_check = false,
+            .crc_check = true,
             .adu[0] = modbus_address,
             .adu[1] = ModBus_WriteRegister,
-            .adu[2] = 0x02,
-            .adu[3] = 0x01,
+            .adu[2] = 0x00,
+            .adu[3] = 0x0D,
             .adu[4] = freq >> 8,
             .adu[5] = freq & 0xFF,
             .tx_length = 8,
@@ -124,14 +125,22 @@ static void spindleSetState (spindle_ptrs_t *spindle, spindle_state_t state, flo
     if(busy)
         return;
 
+    uint16_t command;
+
+    if(!state.on || rpm == 0.0f)
+        command = 0x0000; // Stop
+    else
+        command = state.ccw ? 0x0004 : 0x0002; // Run CCW/CW
+
     modbus_message_t mode_cmd = {
         .context = (void *)VFD_SetStatus,
-        .crc_check = false,
+        .crc_check = true,
         .adu[0] = modbus_address,
-        .adu[1] = ModBus_WriteCoil,
+        .adu[1] = ModBus_WriteRegister,
         .adu[2] = 0x00,
-        .adu[3] = (!state.on || rpm == 0.0f) ? 0x4B : (state.ccw ? 0x4A : 0x49),
-        .adu[4] = 0xFF,
+        .adu[3] = 0x08,
+        .adu[4] = command >> 8,
+        .adu[5] = command & 0xFF,
         .tx_length = 8,
         .rx_length = 8
     };
@@ -182,7 +191,8 @@ static spindle_data_t *spindleGetData (spindle_data_request_t request)
 
 static float f2rpm (uint16_t f)
 {
-    return (float)f * 6.0f; // * 60.0f / 10.0f
+    // Frequency values are reported in 0.01 Hz units
+    return (float)f * 0.6f; // * 60.0f / 100.0f
 }
 
 static void rx_packet (modbus_message_t *msg)
