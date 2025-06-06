@@ -68,7 +68,7 @@ static void spindleGetRPMLimits (void *data)
     if(modbus_send(&cmd, &callbacks, true)) {
 
         cmd.context = (void *)VFD_GetMaxRPM;
-        cmd.adu[3] = 0x05; // PD05
+        cmd.adu[3] = 0x0C; // PD12 maximum frequency
 
         modbus_send(&cmd, &callbacks, true);
     }
@@ -94,7 +94,7 @@ static void set_rpm (float rpm, bool block)
             .adu[0] = modbus_address,
             .adu[1] = ModBus_WriteRegister,
             .adu[2] = 0x00,
-            .adu[3] = 0x0D,
+            .adu[3] = 0x00,
             .adu[4] = freq >> 8,
             .adu[5] = freq & 0xFF,
             .tx_length = 8,
@@ -138,7 +138,7 @@ static void spindleSetState (spindle_ptrs_t *spindle, spindle_state_t state, flo
         .adu[0] = modbus_address,
         .adu[1] = ModBus_WriteRegister,
         .adu[2] = 0x00,
-        .adu[3] = 0x08,
+        .adu[3] = 0x01,
         .adu[4] = command >> 8,
         .adu[5] = command & 0xFF,
         .tx_length = 8,
@@ -168,13 +168,13 @@ static spindle_state_t spindleGetState (spindle_ptrs_t *spindle)
         .context = (void *)VFD_GetRPM,
         .crc_check = false,
         .adu[0] = modbus_address,
-        .adu[1] = ModBus_ReadInputRegisters,
-        .adu[2] = 0x00,
+        .adu[1] = ModBus_ReadHoldingRegisters,
+        .adu[2] = 0x21,
         .adu[3] = 0x00,
         .adu[4] = 0x00,
-        .adu[5] = 0x02,
+        .adu[5] = 0x01,
         .tx_length = 8,
-        .rx_length = 9
+        .rx_length = 7
     };
 
     modbus_send(&mode_cmd, &callbacks, false);
@@ -202,8 +202,11 @@ static void rx_packet (modbus_message_t *msg)
         switch((vfd_response_t)msg->context) {
 
             case VFD_GetRPM:
-                spindle_validate_at_speed(spindle_data, f2rpm((msg->adu[3] << 8) | msg->adu[4]));
-                break;
+            {
+                uint16_t freq = (msg->adu[3] << 8) | msg->adu[4];
+                spindle_validate_at_speed(spindle_data, f2rpm(freq));
+            }
+            break;
 
             case VFD_GetMinRPM:
                 freq_min = (msg->adu[3] << 8) | msg->adu[4];
