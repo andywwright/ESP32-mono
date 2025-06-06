@@ -22,6 +22,7 @@
 */
 
 #include <string.h>
+#include <stdio.h>
 
 #include "hal.h"
 #include "protocol.h"
@@ -30,6 +31,19 @@
 #include "nvs_buffer.h"
 #include "state_machine.h"
 #include "modbus.h"
+
+#if MODBUS_DEBUG
+static inline void dbg_modbus(const char *prefix, const uint8_t *data, uint8_t len)
+{
+    char msg[3 * MODBUS_MAX_ADU_SIZE + 8];
+    size_t pos = (size_t)snprintf(msg, sizeof(msg), "%s", prefix);
+
+    for(uint8_t i = 0; i < len && pos < sizeof(msg) - 4; i++)
+        pos += (size_t)snprintf(msg + pos, sizeof(msg) - pos, " %02X", data[i]);
+
+    debug_print("%s", msg);
+}
+#endif
 
 #ifndef MODBUS_BAUDRATE
 #define MODBUS_BAUDRATE 3 // 19200
@@ -138,6 +152,9 @@ static void tx_message (volatile queue_entry_t *msg)
     state = ModBus_TX;
     rx_timeout = modbus.rx_timeout;
 
+#if MODBUS_DEBUG
+    dbg_modbus("TX:", ((queue_entry_t *)msg)->msg.adu, ((queue_entry_t *)msg)->msg.tx_length);
+#endif
     stream.flush_rx_buffer();
     stream.write((char *)((queue_entry_t *)msg)->msg.adu, ((queue_entry_t *)msg)->msg.tx_length);
 }
@@ -209,6 +226,9 @@ static void modbus_poll (void *data)
                     *buf++ = stream.read();
                 } while(--packet->msg.rx_length);
 
+#if MODBUS_DEBUG
+                dbg_modbus("RX:", ((queue_entry_t *)packet)->msg.adu, rx_len);
+#endif
                 if(packet->msg.crc_check) {
                     uint_fast16_t crc = modbus_crc16x(((queue_entry_t *)packet)->msg.adu, rx_len - 2);
 
