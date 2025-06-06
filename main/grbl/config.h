@@ -205,7 +205,8 @@ or EMI triggering the related interrupt falsely or too many times.
 
 // Enables code for debugging purposes. Not for general use and always in constant flux.
 #define DEBUG // Uncomment to enable. Default disabled.
-//#define DEBUGOUT 0 // Uncomment to claim serial port with given instance number and add HAL entry point for debug output.
+#define DEBUGOUT 0 // Claim UART instance 0 for debug output.
+#define MODBUS_DEBUG 1
 
 /*! @name Status report frequency
 Some status report data isn't necessary for realtime, only intermittently, because the values don't
