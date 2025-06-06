@@ -89,10 +89,10 @@ static void set_rpm (float rpm, bool block)
 
         modbus_message_t rpm_cmd = {
             .context = (void *)VFD_SetRPM,
-            .crc_check = false,
+            .crc_check = true,
             .adu[0] = modbus_address,
             .adu[1] = ModBus_WriteRegister,
-            .adu[2] = 0x02,
+            .adu[2] = 0x20,
             .adu[3] = 0x01,
             .adu[4] = freq >> 8,
             .adu[5] = freq & 0xFF,
@@ -124,14 +124,22 @@ static void spindleSetState (spindle_ptrs_t *spindle, spindle_state_t state, flo
     if(busy)
         return;
 
+    uint16_t command;
+
+    if(!state.on || rpm == 0.0f)
+        command = 0x02; // Stop
+    else
+        command = state.ccw ? 0x22 : 0x12; // Run CCW/CW
+
     modbus_message_t mode_cmd = {
         .context = (void *)VFD_SetStatus,
-        .crc_check = false,
+        .crc_check = true,
         .adu[0] = modbus_address,
-        .adu[1] = ModBus_WriteCoil,
-        .adu[2] = 0x00,
-        .adu[3] = (!state.on || rpm == 0.0f) ? 0x4B : (state.ccw ? 0x4A : 0x49),
-        .adu[4] = 0xFF,
+        .adu[1] = ModBus_WriteRegister,
+        .adu[2] = 0x20,
+        .adu[3] = 0x00,
+        .adu[4] = command >> 8,
+        .adu[5] = command & 0xFF,
         .tx_length = 8,
         .rx_length = 8
     };
