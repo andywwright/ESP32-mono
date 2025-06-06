@@ -411,6 +411,15 @@ static uint32_t modbus_get_baud (setting_id_t setting)
     return get_baudrate(modbus.baud_rate);
 }
 
+static void modbus_log_settings(void)
+{
+    debug_print("MODBUS: stream=%d dir=%d baud=%lu rx_timeout=%lu silence_timeout=%lu",
+                stream_instance, dir_port,
+                (unsigned long)modbus.baud_rate,
+                (unsigned long)modbus.rx_timeout,
+                (unsigned long)silence_timeout);
+}
+
 static const setting_detail_t modbus_settings[] = {
     { Settings_ModBus_BaudRate, Group_ModBus, "ModBus baud rate", NULL, Format_RadioButtons, "2400,4800,9600,19200,38400,115200", NULL, NULL, Setting_NonCoreFn, modbus_set_baud, modbus_get_baud, NULL },
     { Settings_ModBus_RXTimeout, Group_ModBus, "ModBus RX timeout", "milliseconds", Format_Integer, "####0", "50", "250", Setting_NonCore, &modbus.rx_timeout, NULL, NULL }
@@ -439,6 +448,7 @@ static void modbus_settings_load (void)
     silence_timeout = silence.timeout[get_baudrate(modbus.baud_rate)];
 
     stream.set_baud_rate(modbus.baud_rate);
+    modbus_log_settings();
 }
 
 static void onReportOptions (bool newopt)
