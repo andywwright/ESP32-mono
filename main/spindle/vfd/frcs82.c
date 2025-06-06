@@ -65,11 +65,13 @@ static void spindleGetRPMLimits (void *data)
         .rx_length = 7
     };
 
+    // 01 03 00 0B 00 01 CRC CRC  → Read PD11 (min frequency)
     if(modbus_send(&cmd, &callbacks, true)) {
 
         cmd.context = (void *)VFD_GetMaxRPM;
         cmd.adu[3] = 0x0C; // PD12 maximum frequency
 
+        // 01 03 00 0C 00 01 CRC CRC  → Read PD12 (max frequency)
         modbus_send(&cmd, &callbacks, true);
     }
 }
@@ -88,13 +90,14 @@ static void set_rpm (float rpm, bool block)
 
         freq = min(max(freq, freq_min), freq_max);
 
+        // 01 06 00 0D HH LL CRC CRC  → Write frequency to 40014 (Hz × 100)
         modbus_message_t rpm_cmd = {
             .context = (void *)VFD_SetRPM,
             .crc_check = true,
             .adu[0] = modbus_address,
             .adu[1] = ModBus_WriteRegister,
             .adu[2] = 0x00,
-            .adu[3] = 0x00,
+            .adu[3] = 0x0D, // 40014: Frequency command register
             .adu[4] = freq >> 8,
             .adu[5] = freq & 0xFF,
             .tx_length = 8,
@@ -132,13 +135,16 @@ static void spindleSetState (spindle_ptrs_t *spindle, spindle_state_t state, flo
     else
         command = state.ccw ? 0x0004 : 0x0002; // Run CCW/CW
 
+    // 01 06 00 08 00 02 CRC CRC  → Start forward (CW)
+    // 01 06 00 08 00 04 CRC CRC  → Start reverse (CCW)
+    // 01 06 00 08 00 00 CRC CRC  → Stop
     modbus_message_t mode_cmd = {
         .context = (void *)VFD_SetStatus,
         .crc_check = true,
         .adu[0] = modbus_address,
         .adu[1] = ModBus_WriteRegister,
         .adu[2] = 0x00,
-        .adu[3] = 0x01,
+        .adu[3] = 0x08, // 40009: Operation command register
         .adu[4] = command >> 8,
         .adu[5] = command & 0xFF,
         .tx_length = 8,
@@ -164,13 +170,14 @@ static spindle_state_t spindleGetState (spindle_ptrs_t *spindle)
 {
     UNUSED(spindle);
 
+    // 01 03 02 00 00 01 CRC CRC  → Read output frequency (40201)
     modbus_message_t mode_cmd = {
         .context = (void *)VFD_GetRPM,
         .crc_check = false,
         .adu[0] = modbus_address,
         .adu[1] = ModBus_ReadHoldingRegisters,
-        .adu[2] = 0x21,
-        .adu[3] = 0x00,
+        .adu[2] = 0x02,
+        .adu[3] = 0x00, // 40201: Output frequency monitor
         .adu[4] = 0x00,
         .adu[5] = 0x01,
         .tx_length = 8,
