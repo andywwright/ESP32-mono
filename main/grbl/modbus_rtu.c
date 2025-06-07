@@ -86,7 +86,7 @@ static const modbus_silence_timeout_t dflt_timeout =
     .b2400   = 16,
     .b4800   = 8,
     .b9600   = 4,
-    .b19200  = 16,
+    .b19200  = 2,
     .b38400  = 2,
     .b115200 = 2
 };
