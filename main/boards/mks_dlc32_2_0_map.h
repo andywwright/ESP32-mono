@@ -32,8 +32,8 @@
 
 #ifdef ADD_SERIAL1
 #define SERIAL1_PORT
-#define UART1_RX_PIN        GPIO_NUM_4
-#define UART1_TX_PIN        GPIO_NUM_0
+#define UART1_RX_PIN        GPIO_NUM_0
+#define UART1_TX_PIN        GPIO_NUM_4
 #endif
 
 #if SDCARD_ENABLE
@@ -114,7 +114,7 @@
 #define AUXINPUT0_PIN       GPIO_NUM_33 // EXP_1,8 (LCD_RS)
 #define AUXINPUT1_PIN       GPIO_NUM_22
 #if !I2C_ENABLE
-#define AUXINPUT2_PIN       GPIO_NUM_4 // Cycle start  // J2,4 (I2C_SCL)
+//#define AUXINPUT2_PIN       GPIO_NUM_4 // Cycle start  // J2,4 (I2C_SCL)
 #endif
 
 // Define user-control controls (cycle start, reset, feed hold) input pins.
@@ -129,7 +129,7 @@
 
 #if I2C_ENABLE
 // Define I2C port/pins
-#define I2C_SDA             GPIO_NUM_0
-#define I2C_SCL             GPIO_NUM_4
+//#define I2C_SDA             GPIO_NUM_0
+//#define I2C_SCL             GPIO_NUM_4
 #define I2C_CLOCK           100000
 #endif

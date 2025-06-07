@@ -321,8 +321,8 @@ static void vfd_settings_restore (void)
     vfd_config.runstop_reg = 0x0008;
     vfd_config.set_freq_reg = 0x000D;
     vfd_config.get_freq_reg = 0x0200;
-    vfd_config.run_cw_cmd = 0x0001;
-    vfd_config.run_ccw_cmd = 0x0002;
+    vfd_config.run_cw_cmd = 0x0002;
+    vfd_config.run_ccw_cmd = 0x0004;
     vfd_config.stop_cmd = 0x0000;
 
     vfd_config.vfd_rpm_hz = 60;
