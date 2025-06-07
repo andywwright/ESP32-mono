@@ -30,7 +30,7 @@
 //#define BOARD_PROTONEER_3XX           //
 //#define BOARD_FYSETC_E4               //
 //#define BOARD_XPRO_V5                 //
-#define BOARD_MKS_DLC32_V2P0          //
+//#define BOARD_MKS_DLC32_V2P0          //
 //#define BOARD_MKS_DLC32_MAX_V1        // Has a ESP32-S3 MCU
 //#define BOARD_MKS_TINYBEE_V1          //
 //#define BOARD_CNC3040                 //
@@ -59,13 +59,13 @@
 // If none are specified the default PWM spindle is instantiated.
 // Spindle definitions can be found in grbl/spindle_control.h.
 // More here https://github.com/grblHAL/Plugins_spindle
-#define SPINDLE0_ENABLE         SPINDLE_MODVFD
+//#define SPINDLE0_ENABLE         SPINDLE_HUANYANG1
 //#define SPINDLE1_ENABLE         SPINDLE_PWM0_NODIR
 //#define SPINDLE2_ENABLE         SPINDLE_NONE
 //#define SPINDLE3_ENABLE         SPINDLE_NONE
 //#define SPINDLE_OFFSET          1 // Uncomment to enable settings for laser spindle XY-offset.
 // **********************
-#define MODBUS_ENABLE           1 // Set to 1 for auto direction, 2 for direction signal on auxiliary output pin.
+//#define MODBUS_ENABLE           1 // Set to 1 for auto direction, 2 for direction signal on auxiliary output pin.
 //#define WEBUI_ENABLE            3 // Enable ESP3D-WEBUI plugin along with networking and SD card plugins.
 //#define WEBUI_AUTH_ENABLE       1 // Enable ESP3D-WEBUI authentication.
 //#define WIFI_ENABLE             1 //

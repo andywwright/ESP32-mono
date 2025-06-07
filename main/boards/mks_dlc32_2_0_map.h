@@ -22,6 +22,9 @@
   along with grblHAL. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#if VFD_SPINDLE
+#error "Board BOARD_MKS_DLC32_V2P0 does not have support for VFD spindle."
+#endif
 
 #include "use_i2s_out.h"
 
@@ -32,8 +35,8 @@
 
 #ifdef ADD_SERIAL1
 #define SERIAL1_PORT
-#define UART1_RX_PIN        GPIO_NUM_4
-#define UART1_TX_PIN        GPIO_NUM_0
+#define UART1_RX_PIN        GPIO_NUM_18
+#define UART1_TX_PIN        GPIO_NUM_19
 #endif
 
 #if SDCARD_ENABLE

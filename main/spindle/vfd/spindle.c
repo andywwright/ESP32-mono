@@ -308,25 +308,15 @@ static void vfd_settings_restore (void)
 #else
     vfd_config.modbus_address = VFD_ADDRESS;
 #endif
-// MODVFD settings below are defaulted to values for GS20 VFD
-    // vfd_config.runstop_reg = 8192; //0x2000
-    // vfd_config.set_freq_reg = 8193; //0x2001
-    // vfd_config.get_freq_reg = 8451; //0x2103
-    // vfd_config.run_cw_cmd = 18; //0x12
-    // vfd_config.run_ccw_cmd = 34; //0x22
-    // vfd_config.stop_cmd = 1; //0x02
-    // vfd_config.in_multiplier = 50;
-
-// Mitsubishi FR-CS82S default register and command values
-    vfd_config.runstop_reg = 0x0008;
-    vfd_config.set_freq_reg = 0x000D;
-    vfd_config.get_freq_reg = 0x0200;
-    vfd_config.run_cw_cmd = 0x0001;
-    vfd_config.run_ccw_cmd = 0x0002;
-    vfd_config.stop_cmd = 0x0000;
-
+//MODVFD settings below are defaulted to values for GS20 VFD
     vfd_config.vfd_rpm_hz = 60;
-    vfd_config.in_multiplier = 100;
+    vfd_config.runstop_reg = 8192; //0x2000
+    vfd_config.set_freq_reg = 8193; //0x2001
+    vfd_config.get_freq_reg = 8451; //0x2103
+    vfd_config.run_cw_cmd = 18; //0x12
+    vfd_config.run_ccw_cmd = 34; //0x22
+    vfd_config.stop_cmd = 1; //0x02
+    vfd_config.in_multiplier = 50;
     vfd_config.in_divider = 60;
     vfd_config.out_multiplier = 60;
     vfd_config.out_divider = 100;
@@ -436,11 +426,6 @@ void vfd_init (void)
 #if SPINDLE_ENABLE & (1<<SPINDLE_H100)
         extern void vfd_h100_init (void);
         vfd_h100_init();
-#endif
-
-#if SPINDLE_ENABLE & (1<<SPINDLE_FRCS82)
-        extern void vfd_frcs82_init (void);
-        vfd_frcs82_init();
 #endif
 
 #if SPINDLE_ENABLE & (1<<SPINDLE_NOWFOREVER)
